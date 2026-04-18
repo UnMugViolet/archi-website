@@ -44,21 +44,26 @@ pipeline {
                     try {
                         sh 'ls -la ./Dockerfile || echo "Dockerfile not found"'
 
-                        def imageName = "${DOCKER_REGISTRY}/archi-website:${env.BUILD_NUMBER}"
-                        def latestImageName = "${DOCKER_REGISTRY}/archi-website:latest"
+                        def appImageName = "${DOCKER_REGISTRY}/archi-website-app:${env.BUILD_NUMBER}"
+                        def appLatestImageName = "${DOCKER_REGISTRY}/archi-website-app:latest"
+                        def webImageName = "${DOCKER_REGISTRY}/archi-website-web:${env.BUILD_NUMBER}"
+                        def webLatestImageName = "${DOCKER_REGISTRY}/archi-website-web:latest"
                         
                         sh """
-                            DOCKER_BUILDKIT=0 docker build -t ${imageName} \
-                            -t ${latestImageName} \
-                            --build-arg NODE_ENV='${env.NODE_ENV}' \
-                            --build-arg BUILD_NUMBER='${env.BUILD_NUMBER}' \
-                            .
+                            DOCKER_BUILDKIT=0 docker compose build --pull app web
+
+                            docker tag archi-website:prod ${appImageName}
+                            docker tag archi-website:prod ${appLatestImageName}
+                            docker tag archi-website-web:prod ${webImageName}
+                            docker tag archi-website-web:prod ${webLatestImageName}
                         """
 
-                        env.IMAGE_NAME = imageName
-                        env.LATEST_IMAGE_NAME = latestImageName
+                        env.APP_IMAGE_NAME = appImageName
+                        env.APP_LATEST_IMAGE_NAME = appLatestImageName
+                        env.WEB_IMAGE_NAME = webImageName
+                        env.WEB_LATEST_IMAGE_NAME = webLatestImageName
 
-                        echo "Docker image built successfully: ${env.IMAGE_NAME}"
+                        echo "Docker images built successfully: ${env.APP_IMAGE_NAME} and ${env.WEB_IMAGE_NAME}"
 
                     } catch (Exception e) {
                         error "Failed to build Docker image: ${e.getMessage()}"
@@ -71,13 +76,17 @@ pipeline {
             steps {
                 script {
                     docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials') {
-                        def versionedImage = docker.image("${env.IMAGE_NAME}")
-                        def latestImage = docker.image("${env.LATEST_IMAGE_NAME}")
+                        def appVersionedImage = docker.image("${env.APP_IMAGE_NAME}")
+                        def appLatestImage = docker.image("${env.APP_LATEST_IMAGE_NAME}")
+                        def webVersionedImage = docker.image("${env.WEB_IMAGE_NAME}")
+                        def webLatestImage = docker.image("${env.WEB_LATEST_IMAGE_NAME}")
                         
-                        versionedImage.push()
-                        latestImage.push()
+                        appVersionedImage.push()
+                        appLatestImage.push()
+                        webVersionedImage.push()
+                        webLatestImage.push()
                         
-                        echo "Successfully pushed ${versionedImage} and ${latestImage} to Docker Hub"
+                        echo "Successfully pushed the app and web images to Docker Hub"
                     }
                 }
             }
@@ -94,15 +103,16 @@ pipeline {
                                     execCommand: '''
                                         cd ~/websites/archi-website &&
                                         echo "🛑 Stopping containers..." &&
-                                        docker compose down &&
+                                        docker compose -f docker-compose.yml down &&
                                         echo "📥 Pulling latest images..." &&
-                                        docker compose pull &&
+                                        docker compose -f docker-compose.yml pull &&
                                         echo "🚀 Starting containers..." &&
-                                        docker compose up -d &&
+                                        docker compose -f docker-compose.yml up -d &&
                                         echo "⏳ Waiting for containers to be ready..." &&
                                         sleep 10 &&
                                         echo "🔧 Running deployment tasks..." &&
-                                        docker exec archi-website make deploy &&
+                                        docker exec archi-website php artisan migrate --force &&
+                                        docker exec archi-website php artisan optimize &&
                                         echo "🧹 Cleaning up..." &&
                                         docker system prune -f &&
                                         docker image prune -f &&

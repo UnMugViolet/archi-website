@@ -1,9 +1,9 @@
 #!/usr/bin/env sh
 set -eu
 
-if [ "${RUN_MIGRATIONS:-false}" = "true" && "${RUN_SEEDERS:-false}" = "true"]; then
+if [ "${RUN_MIGRATIONS:-false}" = "true" ] && [ "${RUN_SEEDERS:-false}" = "true" ]; then
     php artisan migrate:fresh --seed
-else if [ "${RUN_MIGRATIONS:-false}" = "true" && "${RUN_SEEDERS:-false}" = "false"];
+elif [ "${RUN_MIGRATIONS:-false}" = "true" ]; then
     php artisan migrate --force
 fi
 
