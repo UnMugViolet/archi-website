@@ -50,7 +50,7 @@ pipeline {
                         def webLatestImageName = "${DOCKER_REGISTRY}/archi-website-web:latest"
                         
                         sh """
-                            DOCKER_BUILDKIT=0 docker compose build --pull app web
+                            DOCKER_BUILDKIT=0 docker-compose build --pull app web
 
                             docker tag archi-website:prod ${appImageName}
                             docker tag archi-website:prod ${appLatestImageName}
