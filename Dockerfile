@@ -47,8 +47,6 @@ COPY docker/php/entrypoint.sh /usr/local/bin/entrypoint
 
 RUN chmod +x /usr/local/bin/entrypoint
 
-USER www-data
-
 EXPOSE 9000
 
 HEALTHCHECK --interval=30s --timeout=5s --retries=3 CMD php-fpm -t || exit 1
