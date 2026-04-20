@@ -44,7 +44,6 @@ RUN mkdir -p storage/framework/cache storage/framework/sessions storage/framewor
     && chmod -R ug+rwx storage bootstrap/cache
 
 COPY docker/php/entrypoint.sh /usr/local/bin/entrypoint
-COPY docker/mariadb/healthcheck.sh /healthcheck.sh
 
 RUN chmod +x /usr/local/bin/entrypoint
 
