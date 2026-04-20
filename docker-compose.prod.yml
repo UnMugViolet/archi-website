@@ -9,9 +9,6 @@ services:
       - SERVER_HTTPS=on
       - FORCE_HTTPS=true
       - SESSION_SECURE_COOKIE=true
-      - DB_CONNECTION=mysql
-      - DB_HOST=mariadb
-      - DB_PORT=3306
     volumes:
       - ./storage:/var/www/html/storage
     networks:
@@ -39,7 +36,7 @@ services:
     image: mariadb:11.8
     container_name: archi-website_db
     environment:
-      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${MARIADB_ROOT_PASSWORD}
       MYSQL_DATABASE: ${DB_DATABASE}
       MYSQL_USER: ${DB_USERNAME}
       MYSQL_PASSWORD: ${DB_PASSWORD}
@@ -48,14 +45,7 @@ services:
     networks:
       - archi-website_network
     healthcheck:
-      test:
-        - CMD-SHELL
-        - >-
-          if [ -n "$${MYSQL_ROOT_PASSWORD}" ]; then
-            mariadb-admin ping -h 127.0.0.1 -uroot -p"$${MYSQL_ROOT_PASSWORD}" --silent;
-          else
-            mariadb-admin ping -h 127.0.0.1 -uroot --silent;
-          fi
+      test: ["CMD", "sh", "/healthcheck.sh"]
       interval: 10s
       timeout: 5s
       retries: 10

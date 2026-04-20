@@ -44,6 +44,7 @@ RUN mkdir -p storage/framework/cache storage/framework/sessions storage/framewor
     && chmod -R ug+rwx storage bootstrap/cache
 
 COPY docker/php/entrypoint.sh /usr/local/bin/entrypoint
+COPY docker/mariadb/healthcheck.sh /healthcheck.sh
 
 RUN chmod +x /usr/local/bin/entrypoint
 
@@ -59,5 +60,5 @@ FROM nginx:1.27-alpine AS web
 
 WORKDIR /var/www/html
 
-COPY docker/nginx/default.conf /etc/nginx/conf.d/default.conf
+COPY docker/nginx/prod.conf /etc/nginx/conf.d/prod.conf
 COPY --from=runtime /var/www/html/public ./public
