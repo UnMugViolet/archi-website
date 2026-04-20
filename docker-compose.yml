@@ -53,8 +53,9 @@ services:
       - '${DB_PORT:-3306}:3306'
     volumes:
       - mariadb-data:/var/lib/mysql
+      - ./docker/mariadb/healthcheck.sh:/healthcheck.sh:ro
     healthcheck:
-      test: ["CMD", "sh", "/healthcheck.sh"]
+      test: ["CMD-SHELL", "sh /healthcheck.sh"]
       interval: 10s
       timeout: 5s
       retries: 10

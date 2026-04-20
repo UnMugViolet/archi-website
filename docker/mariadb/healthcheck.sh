@@ -2,9 +2,9 @@
 
 set -eu
 
-if [ -n "$${MARIADB_ROOT_PASSWORD}" && [ -n "$${MARIADB_ROOT_HOST}"]]; then
-	mariadb-admin ping -h 127.0.0.1 -u"$${MARIADB_ROOT_HOST}" -p"$${MARIADB_ROOT_PASSWORD}" --silent;
+if [ -n "${MARIADB_ROOT_PASSWORD:-}" ]; then
+	mariadb-admin ping -h 127.0.0.1 -uroot -p"${MARIADB_ROOT_PASSWORD}" --silent
 else
-	mariadb-admin ping -h 127.0.0.1 -u"$${MARIADB_ROOT_HOST}" --silent;
+	mariadb-admin ping -h 127.0.0.1 -uroot --silent
 fi
 
