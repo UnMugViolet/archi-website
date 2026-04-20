@@ -53,9 +53,8 @@ services:
       - '${DB_PORT:-3306}:3306'
     volumes:
       - mariadb-data:/var/lib/mysql
-      - ./docker/mariadb/healthcheck.sh:/healthcheck.sh:ro
     healthcheck:
-      test: ["CMD-SHELL", "sh /healthcheck.sh"]
+      test: ["CMD-SHELL", "[ -n \"$$MARIADB_ROOT_PASSWORD\" ] && mariadb-admin ping -h 127.0.0.1 -uroot -p\"$$MARIADB_ROOT_PASSWORD\" --silent || mariadb-admin ping -h 127.0.0.1 -uroot --silent"]
       interval: 10s
       timeout: 5s
       retries: 10
