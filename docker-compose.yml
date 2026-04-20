@@ -1,4 +1,42 @@
 services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: runtime
+    image: archi-website:prod
+    restart: unless-stopped
+    environment:
+      APP_ENV: ${APP_ENV:-production}
+      APP_DEBUG: ${APP_DEBUG:-false}
+      APP_URL: ${APP_URL}
+      LOG_CHANNEL: ${LOG_CHANNEL}
+      DB_CONNECTION: ${DB_CONNECTION}
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_DATABASE: ${DB_DATABASE}
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    networks:
+      - app-network
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: web
+    image: archi-website-web:prod
+    restart: unless-stopped
+    depends_on:
+      app:
+        condition: service_healthy
+    ports:
+      - '${APP_PORT}'
+    networks:
+      - app-network
 
   mariadb:
     image: mariadb:11.8
@@ -12,7 +50,7 @@ services:
       MARIADB_USER: ${DB_USERNAME}
       MARIADB_PASSWORD: ${DB_PASSWORD}
     ports:
-      - '${DB_PORT}:3306'
+      - '${DB_PORT}'
     volumes:
       - mariadb-data:/var/lib/mysql
     healthcheck:
