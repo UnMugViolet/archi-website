@@ -59,5 +59,6 @@ FROM nginx:1.27-alpine AS web
 
 WORKDIR /var/www/html
 
-COPY docker/nginx/prod.conf /etc/nginx/conf.d/prod.conf
+RUN rm -f /etc/nginx/conf.d/default.conf
+COPY docker/nginx/prod.conf /etc/nginx/conf.d/default.conf
 COPY --from=runtime /var/www/html/public ./public
