@@ -39,7 +39,8 @@ FROM base AS runtime
 
 COPY --from=frontend /var/www/html/public/build ./public/build
 
-RUN mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views bootstrap/cache app app/public app/public/projects\
+RUN mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views bootstrap/cache \ 
+    app app/public app/public/projects \
     && chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R ug+rwx storage bootstrap/cache
 
