@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class AwardOrPublication extends Model
 {
+    protected $table = 'award_or_publication';
+
     protected $fillable = [
         'project_id',
         'entry_type',

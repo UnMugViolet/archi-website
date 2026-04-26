@@ -34,7 +34,7 @@ class Project extends Model
             ->orderBy('display_order');
     }
 
-    public function awardsOrPublications(): HasMany
+    public function awardOrPublication(): HasMany
     {
         return $this->hasMany(AwardOrPublication::class)
             ->orderBy('display_order');

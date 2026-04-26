@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('awards_or_publications', function (Blueprint $table) {
+        Schema::create('award_or_publication', function (Blueprint $table) {
             $table->id();
             $table->foreignId('project_id')->nullable()->constrained()->nullOnDelete();
             $table->string('entry_type');
@@ -33,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('awards_or_publications');
+        Schema::dropIfExists('award_or_publication');
     }
 };
