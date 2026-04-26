@@ -10,4 +10,10 @@ storage/framework/sessions/*
 storage/framework/testing/*
 storage/framework/views/*
 bootstrap/cache/*.php
+Makefile
+Dockerfile
+docker-compose.yml
+tests/*
+sonar-project.properties
 README.md
+AGENTS.md
