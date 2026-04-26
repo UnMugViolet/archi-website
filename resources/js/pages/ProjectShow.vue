@@ -95,7 +95,18 @@ const selectImage = (index: number): void => {
 </script>
 
 <template>
-    <Head :title="project.meta_title || project.title" />
+    <Head :title="project.meta_title || project.title">
+        <meta
+            head-key="title"
+            name="title"
+            :content="project.meta_title || project.title || 'Archi website nouveau projet en construction'"
+        />
+        <meta
+            head-key="description"
+            name="description"
+            :content="project.meta_description || project.meta_description || 'Archi website nouveau projet en construction'"
+        />
+    </Head>
 
     <div class="min-h-screen bg-white text-stone-900">
         <main class="mx-auto w-full px-50 py-12">

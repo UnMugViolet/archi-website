@@ -12,11 +12,21 @@ const props = defineProps<{
     projects: ProjectListItem[];
 }>();
 
-console.log(props.projects);
 </script>
 
 <template>
-    <Head title="Projets" />
+    <Head title="Archi website">
+        <meta
+            head-key="title"
+            name="title"
+            content="Archi website - Projets d'architecture à découvrir"
+        />
+        <meta
+            head-key="description"
+            name="description"
+            content="Agence d'architecture basée à Paris, spécialisée dans la conception de projets innovants et durables."
+        />
+    </Head>
 
     <div class="min-h-screen text-stone-900">
         <main class="mx-auto w-full px-50 px-6 py-12">
