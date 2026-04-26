@@ -42,17 +42,17 @@ class ImageSeeder extends Seeder
         }
 
         foreach ($groupedByFolder as $folder => $paths) {
-            $slug = Str::slug($folder);
-            $title = Str::title(str_replace(['-', '_'], ' ', $folder));
+            $projectId = (int) $folder;
 
-            $project = Project::query()->updateOrCreate(
-                ['slug' => $slug],
-                [
-                    'title' => $title,
-                    'meta_title' => $title,
-                    'status' => 'draft',
-                ]
-            );
+            if ($projectId <= 0) {
+                continue;
+            }
+
+            $project = Project::query()->find($projectId);
+
+            if (! $project) {
+                continue;
+            }
 
             $seededPaths = [];
 
