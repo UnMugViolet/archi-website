@@ -61,8 +61,8 @@ watch(
                 <ProjectGallery v-if="currentView === 'gallery'" :projects="projects" />
                 <ProjectList v-else :projects="projects" />
 				<div class="absolute left-[50%] top-15 transform -translate-x-1/2  flex space-x-4 z-10">
-                    <p @click="handleViewChange('gallery')" :class="currentView === 'gallery' ? 'font-bold' : 'cursor-pointer'">Gallerie</p>
-                    <p @click="handleViewChange('list')" :class="currentView === 'list' ? 'font-bold ' : 'cursor-pointer'">Liste</p>
+                    <p @click="handleViewChange('gallery')" :class="currentView === 'gallery' ? 'underline' : 'cursor-pointer'">Gallerie</p>
+                    <p @click="handleViewChange('list')" :class="currentView === 'list' ? 'underline ' : 'cursor-pointer'">Liste</p>
 				</div>
             </div>
         </div>

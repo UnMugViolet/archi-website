@@ -16,23 +16,29 @@ console.log(props.projects);
 </script>
 
 <template>
-	<HomepageContainer>
-		<table class="text-xs text-white uppercase py-10">
-			<thead class="text-xs text-white uppercase">
-
+	<HomepageContainer class="pt-20">
+		<table class="text-xs text-black uppercase w-7/12">
+			<thead class="text-xs uppercase">
+				<tr>
+					<th class="w-1/6">Années</th>
+					<th>Projets</th>
+					<th>Catégories</th>
+					<th>Lieu</th>
+				</tr>
 			</thead>
-			<tr>
-				<th></th>
-			</tr>
-			<article v-for="project in props.projects" :key="project.id" class="w-full max-w-md">
-
-
-				<div class="py-3">
-					<h2 class="text-3xl font-medium uppercase tracking-wide font-strichpunkt">
-						{{ project.title }}
-					</h2>
-				</div>
-			</article>
+			<tbody>
+				<tr v-for="project in props.projects" :key="project.id">
+					<td class="w-1/6">{{ project.date }}</td>
+					<td class="w-1/2">{{ project.title }}</td>
+					<td class="w-1/6">{{ project.categories }}</td>
+					<td class="w-1/6">{{ project.location }}</td>
+				</tr>
+			</tbody>
 		</table>
+
+		 <!-- Image preview on hover, to be implemented later -->
+		<div class="w-5/12"">
+
+		</div>
 	</HomepageContainer>
 </template>
