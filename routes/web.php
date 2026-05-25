@@ -2,9 +2,14 @@
 
 use App\Http\Controllers\HomepageController;
 use App\Http\Controllers\ProjectController;
+use App\Http\Controllers\AboutController;
+use App\Http\Controllers\ContactController;
+
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomepageController::class, 'index'])->name('home');
+Route::get('/agence', [AboutController::class, 'index'])->name('about');
+Route::get('/contact', [ContactController::class, 'index'])->name('contact');
 
 Route::get('/{project:slug}', [ProjectController::class, 'show'])
     ->where('project', '^(?!admin|access-admin-fanny|dashboard|orchid).*')
