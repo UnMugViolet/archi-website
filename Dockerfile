@@ -32,7 +32,7 @@ COPY --from=vendor /app/vendor ./vendor
 FROM base AS frontend
 
 RUN apk add --no-cache nodejs npm
-RUN npm ci && npm run build
+RUN npm install && npm run build
 
 
 FROM base AS runtime
