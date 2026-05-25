@@ -13,7 +13,8 @@ class Project extends Model
     {
         return $this->belongsToMany(Category::class)
             ->withPivot('display_order')
-            ->withTimestamps();
+            ->withTimestamps()
+            ->orderByPivot('display_order');
     }
 
     public function images(): MorphMany
@@ -38,5 +39,22 @@ class Project extends Model
     {
         return $this->hasMany(AwardOrPublication::class)
             ->orderBy('display_order');
+    }
+
+    public function firstCategory(): ?Category
+    {
+        return $this->categories->first();
+    }
+
+    public function projectDate(): ?string
+    {
+        return $this->metrics->firstWhere('label', 'Livraison')?->value
+            ?? $this->metrics->firstWhere('label', 'Date')?->value;
+    }
+
+    public function location(): ?string
+    {
+        return $this->metrics->firstWhere('label', 'Lieu')?->value
+            ?? $this->metrics->firstWhere('label', 'Location')?->value;
     }
 }

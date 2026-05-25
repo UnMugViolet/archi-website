@@ -109,10 +109,6 @@ const showNextImage = (): void => {
 
     <div class="min-h-screen bg-white text-stone-900">
         <main class="mx-auto w-full px-50 py-12">
-            <Link href="/" class="mb-8 inline-block text-sm text-stone-600 hover:text-stone-900">
-                Retour aux projets
-            </Link>
-
             <section class="mb-12 grid gap-8  p-6 lg:grid-cols-2 lg:p-8">
                 <div>
                     <h1 class="text-4xl font-semibold tracking-tight">{{ project.title }}</h1>

@@ -10,6 +10,9 @@ type ProjectListItem = {
     id: number;
     title: string;
     slug: string;
+    date: string | null;
+    category: string | null;
+    location: string | null;
     cover_image: string | null;
 };
 

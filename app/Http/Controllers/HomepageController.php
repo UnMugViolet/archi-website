@@ -13,6 +13,12 @@ class HomepageController extends Controller
         $projects = Project::query()
             ->where('status', 'published')
             ->with([
+                'categories' => function ($query): void {
+                    $query->orderByPivot('display_order');
+                },
+                'metrics' => function ($query): void {
+                    $query->orderBy('display_order');
+                },
                 'images' => function ($query): void {
                     $query->orderBy('display_order');
                 },
@@ -26,6 +32,9 @@ class HomepageController extends Controller
                     'id' => $project->id,
                     'title' => $project->title,
                     'slug' => $project->slug,
+                    'date' => $project->projectDate(),
+                    'category' => $project->firstCategory()?->name,
+                    'location' => $project->location(),
                     'cover_image' => $coverImage ? '/storage/'.$coverImage->path : null,
                 ];
             })
