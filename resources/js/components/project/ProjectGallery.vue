@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, onBeforeUnmount, onMounted, ref } from 'vue';
 import Thumbnail from '@/components/project/Thumbnail.vue';
 
 type ProjectListItem = {
@@ -17,11 +17,7 @@ const viewport = ref<HTMLElement | null>(null);
 const panX = ref(0);
 const panY = ref(0);
 const spread = ref(1);
-const spreadMin = 1;
-const spreadMax = 1.5;
 const scale = ref(1);
-const scaleMin = 0.8;
-const scaleMax = 1.25;
 const isDragging = ref(false);
 const dragStartX = ref(0);
 const dragStartY = ref(0);
@@ -31,6 +27,37 @@ const hasDragged = ref(false);
 const lastTouchX = ref(0);
 const lastTouchY = ref(0);
 const isTouching = ref(false);
+
+const isMobile = ref(false);
+let mobileMediaQuery: MediaQueryList | null = null;
+
+const syncIsMobile = (): void => {
+	isMobile.value = mobileMediaQuery?.matches ?? false;
+};
+
+onMounted(() => {
+	mobileMediaQuery = globalThis.matchMedia('(max-width: 639px)');
+	syncIsMobile();
+
+	if (mobileMediaQuery.addEventListener) {
+		mobileMediaQuery.addEventListener('change', syncIsMobile);
+	} else {
+		// Safari < 14
+		mobileMediaQuery.addListener(syncIsMobile);
+	}
+});
+
+onBeforeUnmount(() => {
+	if (!mobileMediaQuery) {
+		return;
+	}
+
+	if (mobileMediaQuery.removeEventListener) {
+		mobileMediaQuery.removeEventListener('change', syncIsMobile);
+	} else {
+		mobileMediaQuery.removeListener(syncIsMobile);
+	}
+});
 
 const cardPositions = [
 	{ top: 8, left: 10, width: 18 },
@@ -47,13 +74,13 @@ const floatingProjects = computed(() => {
 	return props.projects.map((project, index) => {
 		const position = cardPositions[index % cardPositions.length];
 		const row = Math.floor(index / cardPositions.length);
-		const spreadFactor = spread.value;
-		const horizontalSpread = 1 + (spreadFactor - 1) * 0.2;
+		const verticalSpreadFactor = spread.value;
+		const horizontalSpreadFactor = isMobile.value ? 2.5 : 1;
 
 		return {
 			...project,
-			top: `${(position.top + row * 34) * spreadFactor}rem`,
-			left: `${50 + ((position.left + (row % 2 ? 6 : 0)) - 50) * horizontalSpread}%`,
+			top: `${(position.top + row * 34) * verticalSpreadFactor}rem`,
+			left: `${50 + ((position.left + (row % 2 ? 6 : 0)) - 50) * horizontalSpreadFactor}%`,
 			width: `clamp(11rem, 24vw, ${position.width}rem)`,
 		};
 	});

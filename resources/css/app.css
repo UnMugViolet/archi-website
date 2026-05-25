@@ -7,3 +7,7 @@
     --font-sans: 'Geist', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
     --font-strichpunkt: 'Strichpunkt Sans', ui-sans-serif, system-ui, sans-serif;
 }
+
+@theme {
+    --color-nero: #1D1D1D;
+}
