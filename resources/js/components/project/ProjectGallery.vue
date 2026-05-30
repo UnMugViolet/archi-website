@@ -59,9 +59,9 @@ onBeforeUnmount(() => {
 // Used as a jitter-grid: projects placed once, no repetition.
 const SLOTS = [
 	{ top: 8,  left: 10, width: 18 },
-	{ top: 18, left: 34, width: 19 },
-	{ top: 10, left: 63, width: 24 },
-	{ top: 26, left: 87, width: 26 },
+	{ top: 18, left: 32, width: 19 },
+	{ top: 10, left: 59, width: 27 },
+	{ top: 26, left: 85, width: 26 },
 	{ top: 40, left: 18, width: 20 },
 	{ top: 48, left: 48, width: 18 },
 	{ top: 62, left: 72, width: 19 },
