@@ -4,11 +4,11 @@ import { Link } from '@inertiajs/vue3';
 </script>
 
 <template>
-	<header class="flex justify-between text-black pt-2 border-b px-4 py-3">
+	<header class="absolute top-0 left-0 w-full flex justify-between text-black pt-2 bg-transparent border-b px-4 py-3 z-2">
 		<div class="mx-auto w-full">
 			<Link href="/">
 			<h1 class="text-2xl tracking-tight">
-				Théorème
+				Facta
 			</h1>
 		</Link>
 		</div>
@@ -18,11 +18,6 @@ import { Link } from '@inertiajs/vue3';
 				<Link href="/agence">
 					<li class="text-lg hover:underline">
 						Agence
-					</li>
-				</Link>
-				<Link href="/contact">
-					<li class="text-lg hover:underline">
-						Contact
 					</li>
 				</Link>
 			</ul>

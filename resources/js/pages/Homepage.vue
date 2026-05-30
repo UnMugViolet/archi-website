@@ -28,6 +28,7 @@ const handleViewChange = (view: 'gallery' | 'list'): void => {
 
 onMounted(() => {
     const queryView = new URLSearchParams(globalThis.location.search).get('view');
+
     if (queryView === 'list') {
         currentView.value = 'list';
     }
@@ -37,6 +38,7 @@ watch(
 	() => currentView.value,
 	(newView) => {
         const url = new URL(globalThis.location.href);
+
         if (newView === 'list') {
             url.searchParams.set('view', 'list');
         } else {

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
+import { Head } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
 import Header from '@/components/base/Header.vue';
 
@@ -139,7 +139,7 @@ const showNextImage = (): void => {
                     </div>
                 </div>
                 <div>
-                    <figure class="overflow-hidden bg-stone-100">
+                    <figure class="overflow-hidden">
                         <img
                             v-if="activeImage"
                             :src="activeImage.path"
@@ -166,7 +166,7 @@ const showNextImage = (): void => {
                     >
                         <button
                             type="button"
-                            class="px-3 py-2 text-sm text-stone-700 hover:bg-stone-100"
+                            class="px-3 py-2 text-sm text-stone-700"
                             @click="showPreviousImage"
                         >
                             Precedent
@@ -174,7 +174,7 @@ const showNextImage = (): void => {
 
                         <button
                             type="button"
-                            class="border border-stone-300 px-3 py-2 text-sm text-stone-700 hover:bg-stone-100"
+                            class="border border-stone-300 px-3 py-2 text-sm text-stone-700"
                             @click="showNextImage"
                         >
                             Suivant

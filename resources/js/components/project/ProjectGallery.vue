@@ -13,21 +13,20 @@ const props = defineProps<{
 	projects: ProjectListItem[];
 }>();
 
-const viewport = ref<HTMLElement | null>(null);
+
 const panX = ref(0);
 const panY = ref(0);
-const spread = ref(1);
-const scale = ref(1);
+
 const isDragging = ref(false);
 const dragStartX = ref(0);
 const dragStartY = ref(0);
 const dragOriginX = ref(0);
 const dragOriginY = ref(0);
 const hasDragged = ref(false);
-const lastTouchX = ref(0);
-const lastTouchY = ref(0);
-const isTouching = ref(false);
 
+let rafId: number | null = null;
+
+// Mobile detection
 const isMobile = ref(false);
 let mobileMediaQuery: MediaQueryList | null = null;
 
@@ -38,104 +37,81 @@ const syncIsMobile = (): void => {
 onMounted(() => {
 	mobileMediaQuery = globalThis.matchMedia('(max-width: 639px)');
 	syncIsMobile();
-
 	if (mobileMediaQuery.addEventListener) {
 		mobileMediaQuery.addEventListener('change', syncIsMobile);
 	} else {
-		// Safari < 14
 		mobileMediaQuery.addListener(syncIsMobile);
 	}
 });
 
 onBeforeUnmount(() => {
-	if (!mobileMediaQuery) {
-		return;
-	}
-
+	if (!mobileMediaQuery) return;
 	if (mobileMediaQuery.removeEventListener) {
 		mobileMediaQuery.removeEventListener('change', syncIsMobile);
 	} else {
 		mobileMediaQuery.removeListener(syncIsMobile);
 	}
+	if (rafId !== null) cancelAnimationFrame(rafId);
 });
 
-const cardPositions = [
-	{ top: 8, left: 10, width: 18 },
+// Layout 
+// Each slot: position as % of world width / rem from top, plus card width in rem.
+// Used as a jitter-grid: projects placed once, no repetition.
+const SLOTS = [
+	{ top: 8,  left: 10, width: 18 },
 	{ top: 18, left: 34, width: 19 },
-	{ top: 10, left: 63, width: 18 },
-	{ top: 26, left: 82, width: 17 },
+	{ top: 10, left: 63, width: 24 },
+	{ top: 26, left: 87, width: 26 },
 	{ top: 40, left: 18, width: 20 },
 	{ top: 48, left: 48, width: 18 },
 	{ top: 62, left: 72, width: 19 },
 	{ top: 74, left: 30, width: 17 },
 ];
 
+// Seeded pseudo-random — same scatter on every render
+function seeded(seed: number) {
+	let s = seed;
+	return () => { s = (s * 9301 + 49297) % 233280; return s / 233280; };
+}
+
 const floatingProjects = computed(() => {
+	const rng = seeded(42);
+	const cols = SLOTS.length;
+	const horizontalSpreadFactor = isMobile.value ? 2.5 : 1;
+
 	return props.projects.map((project, index) => {
-		const position = cardPositions[index % cardPositions.length];
-		const row = Math.floor(index / cardPositions.length);
-		const verticalSpreadFactor = spread.value;
-		const horizontalSpreadFactor = isMobile.value ? 2.5 : 1;
+		const slot = SLOTS[index % cols];
+		const row = Math.floor(index / cols);
+
+		// Jitter within the cell so cards don't stack in a rigid grid
+		const jitterLeft = (rng() - 0.5) * 6;   // ±3% horizontal
+		const jitterTop  = (rng() - 0.5) * 4;   // ±2rem vertical
+
+		const rawLeft = slot.left + (row % 2 ? 6 : 0) + jitterLeft;
+		const adjustedLeft = 50 + (rawLeft - 50) * horizontalSpreadFactor;
+		const top = slot.top + row * 34 + jitterTop;
 
 		return {
 			...project,
-			top: `${(position.top + row * 34) * verticalSpreadFactor}rem`,
-			left: `${50 + ((position.left + (row % 2 ? 6 : 0)) - 50) * horizontalSpreadFactor}%`,
-			width: `clamp(11rem, 24vw, ${position.width}rem)`,
+			top:   `${top}rem`,
+			left:  `${adjustedLeft}%`,
+			width: `clamp(11rem, 24vw, ${slot.width}rem)`,
 		};
 	});
 });
 
-const sceneHeight = computed(() => {
-	const rows = Math.max(2, Math.ceil(props.projects.length / cardPositions.length));
-
-	return `${(rows * 42 + 24) * spread.value}rem`;
+// World height grows with project count — no artificial cap
+const worldHeight = computed(() => {
+	const rows = Math.max(2, Math.ceil(props.projects.length / SLOTS.length));
+	return `${rows * 42 + 24}rem`;
 });
 
-
-const handleWheel = (event: WheelEvent): void => {
-	event.preventDefault();
-};
-
-const handleTouchStart = (event: TouchEvent): void => {
-	const touch = event.touches[0];
-
-	if (!touch) {
-		return;
-	}
-
-	isTouching.value = true;
-	lastTouchX.value = touch.clientX;
-	lastTouchY.value = touch.clientY;
-};
-
-const handleTouchMove = (event: TouchEvent): void => {
-	if (!isTouching.value) {
-		return;
-	}
-
-	const container = viewport.value;
-	const touch = event.touches[0];
-
-	if (!container || !touch) {
-		return;
-	}
-
-	event.preventDefault();
-	lastTouchX.value = touch.clientX;
-	lastTouchY.value = touch.clientY;
-};
-
-const handleTouchEnd = (): void => {
-	isTouching.value = false;
-};
-
+// Pointer handlers
 const handlePointerDown = (event: PointerEvent): void => {
 	const target = event.target as HTMLElement | null;
+	if (target?.closest('a[href]')) return;
 
-	if (target?.closest('a[href]')) {
-		return;
-	}
+	if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; }
 
 	isDragging.value = true;
 	hasDragged.value = false;
@@ -148,9 +124,7 @@ const handlePointerDown = (event: PointerEvent): void => {
 };
 
 const handlePointerMove = (event: PointerEvent): void => {
-	if (!isDragging.value) {
-		return;
-	}
+	if (!isDragging.value) return;
 
 	const deltaX = event.clientX - dragStartX.value;
 	const deltaY = event.clientY - dragStartY.value;
@@ -163,15 +137,56 @@ const handlePointerMove = (event: PointerEvent): void => {
 	panY.value = dragOriginY.value + deltaY;
 };
 
-const handlePointerUp = (event: PointerEvent): void => {
+const handlePointerUp = (): void => {
+	if (!isDragging.value) return;
 	isDragging.value = false;
+	// Release into momentum
+	setTimeout(() => { hasDragged.value = false; }, 20);
 };
 
-const handleClickCapture = (event: MouseEvent): void => {
-	if (!hasDragged.value) {
-		return;
-	}
+// Wheel / trackpad
+const handleWheel = (event: WheelEvent): void => {
+	event.preventDefault();
+	if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; }
+	panX.value -= event.deltaX;
+	panY.value -= event.deltaY;
+};
 
+// Touch (single-finger pan)
+let touchStartX = 0;
+let touchStartY = 0;
+let touchOriginX = 0;
+let touchOriginY = 0;
+let isTouching = false;
+
+const handleTouchStart = (event: TouchEvent): void => {
+	const touch = event.touches[0];
+	if (!touch) return;
+	if (rafId !== null) { cancelAnimationFrame(rafId); rafId = null; }
+	isTouching = true;
+	touchStartX = touch.clientX;
+	touchStartY = touch.clientY;
+	touchOriginX = panX.value;
+	touchOriginY = panY.value;
+};
+
+const handleTouchMove = (event: TouchEvent): void => {
+	if (!isTouching) return;
+	const touch = event.touches[0];
+	if (!touch) return;
+	event.preventDefault();
+
+	panX.value = touchOriginX + (touch.clientX - touchStartX);
+	panY.value = touchOriginY + (touch.clientY - touchStartY);
+};
+
+const handleTouchEnd = (): void => {
+	isTouching = false;
+};
+
+// Click suppression after drag
+const handleClickCapture = (event: MouseEvent): void => {
+	if (!hasDragged.value) return;
 	event.preventDefault();
 	event.stopPropagation();
 	hasDragged.value = false;
@@ -180,7 +195,6 @@ const handleClickCapture = (event: MouseEvent): void => {
 
 <template>
 	<div
-		ref="viewport"
 		class="relative h-full overflow-hidden bg-stone-50 text-stone-900 overscroll-contain select-none cursor-grab active:cursor-grabbing"
 		@wheel.prevent="handleWheel"
 		@touchstart.passive="handleTouchStart"
@@ -194,12 +208,12 @@ const handleClickCapture = (event: MouseEvent): void => {
 		@click.capture="handleClickCapture"
 	>
 		<div
-			class="relative mx-auto w-full px-4 py-6 sm:px-6 lg:px-8"
+			class="relative w-full"
 			:style="{
-				minHeight: sceneHeight,
-				minWidth: '100%',
+				minHeight: worldHeight,
 				transform: `translate3d(${panX}px, ${panY}px, 0)`,
 				transformOrigin: 'center top',
+				willChange: 'transform',
 			}"
 		>
 			<div
@@ -210,7 +224,7 @@ const handleClickCapture = (event: MouseEvent): void => {
 					top: project.top,
 					left: project.left,
 					width: project.width,
-					transform: `translateX(-50%) scale(${scale})`,
+					transform: 'translateX(-50%)',
 					transformOrigin: 'center top',
 				}"
 			>

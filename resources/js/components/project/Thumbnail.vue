@@ -16,17 +16,17 @@ const { project } = defineProps<{
 <template>
     <Link :href="`/${project.slug}`" class="group block">
         <article class="overflow-hidden">
-            <div class="relative aspect-4/5 overflow-hidden bg-stone-100">
+            <div class="relative">
                 <img
                     v-if="project.cover_image"
                     :src="project.cover_image"
                     :alt="project.title"
-                    class="h-full w-full object-cover transition duration-500 group-hover:scale-[1.02]"
+                    class="h-auto w-full object-contain"
                     loading="lazy"
                 />
                 <div
                     v-else
-                    class="flex h-full items-center justify-center px-4 text-center text-sm uppercase tracking-[0.3em] text-stone-500"
+                    class="flex aspect-4/5 items-center justify-center px-4 text-center text-sm uppercase tracking-[0.3em] text-stone-500"
                 >
                     Sans image
                 </div>
