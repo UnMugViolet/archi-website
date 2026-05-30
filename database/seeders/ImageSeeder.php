@@ -12,6 +12,7 @@ class ImageSeeder extends Seeder
 {
     /**
      * Run the database seeds.
+     * Gets the images from storage/app/public/projects
      */
     public function run(): void
     {

@@ -1,72 +1,73 @@
 <script setup lang="ts">
-import { Head, Link } from '@inertiajs/vue3';
+import { Head } from '@inertiajs/vue3';
+import { onMounted, ref, watch } from 'vue';
+import Header from '@/components/base/Header.vue';
+import HomepageContainer from '@/components/container/HomepageContainer.vue';
+import ProjectGallery from '@/components/project/ProjectGallery.vue';
+import ProjectList from '@/components/project/ProjectList.vue';
 
 type ProjectListItem = {
     id: number;
     title: string;
     slug: string;
+    date: string | null;
+    category: string | null;
+    location: string | null;
     cover_image: string | null;
 };
 
-const props = defineProps<{
+const { projects } = defineProps<{
     projects: ProjectListItem[];
 }>();
 
+const currentView = ref<'gallery' | 'list'>('gallery');
+
+const handleViewChange = (view: 'gallery' | 'list'): void => {
+	currentView.value = view;
+};
+
+onMounted(() => {
+    const queryView = new URLSearchParams(globalThis.location.search).get('view');
+    if (queryView === 'list') {
+        currentView.value = 'list';
+    }
+});
+
+watch(
+	() => currentView.value,
+	(newView) => {
+        const url = new URL(globalThis.location.href);
+        if (newView === 'list') {
+            url.searchParams.set('view', 'list');
+        } else {
+            url.searchParams.delete('view');
+        }
+
+        const nextUrl = `${url.pathname}${url.search}${url.hash}`;
+        globalThis.history.replaceState(null, '', nextUrl);
+	}
+);
 </script>
 
 <template>
     <Head title="Archi website">
-        <meta
-            head-key="title"
-            name="title"
-            content="Archi website - Projets d'architecture à découvrir"
-        />
-        <meta
-            head-key="description"
-            name="description"
-            content="Agence d'architecture basée à Paris, spécialisée dans la conception de projets innovants et durables."
-        />
+        <title>Archi website</title>
+        <meta head-key="title" name="title" content="Archi website - Projets d'architecture à découvrir" />
+        <meta head-key="description" name="description" content="Agence d'architecture basée à Paris, spécialisée dans la conception de projets innovants et durables." />
     </Head>
 
-    <div class="min-h-screen text-stone-900">
-        <main class="mx-auto w-full px-50 px-6 py-12">
-            <header class="mb-10">
-                <h1 class="mt-2 text-4xl font-semibold tracking-tight">
-                    Archi website
-                </h1>
-            </header>
+    <HomepageContainer>
+        <div class="flex h-svh flex-col overflow-hidden">
+            <Header />
 
-            <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-                <article
-                    v-for="project in projects"
-                    :key="project.id"
-                    class="overflow-hidden border border-stone-200 bg-white"
-                >
-                    <Link :href="`/${project.slug}`" class="block">
-                        <img
-                            v-if="project.cover_image"
-                            :src="project.cover_image"
-                            :alt="project.title"
-                            class="h-60 w-full object-cover"
-                        />
-                        <div
-                            v-else
-                            class="flex h-60 items-center justify-center bg-stone-200 text-stone-500"
-                        >
-                            Sans image
-                        </div>
-
-                        <div class="space-y-3 p-5">
-                            <h2 class="text-xl font-medium">
-                                {{ project.title }}
-                            </h2>
-                            <span class="inline-block text-sm font-medium text-stone-900">
-                                Voir le projet
-                            </span>
-                        </div>
-                    </Link>
-                </article>
+            <div class="min-h-0 flex-1">
+                <ProjectGallery v-if="currentView === 'gallery'" :projects="projects" />
+                <ProjectList v-else :projects="projects" />
+				<div class="absolute left-[50%] top-15 transform -translate-x-1/2  flex space-x-4 z-10">
+                    <p @click="handleViewChange('gallery')" :class="currentView === 'gallery' ? 'underline' : 'cursor-pointer'">Gallerie</p>
+                    <p @click="handleViewChange('list')" :class="currentView === 'list' ? 'underline ' : 'cursor-pointer'">Liste</p>
+				</div>
             </div>
-        </main>
-    </div>
+        </div>
+    </HomepageContainer>
 </template>

@@ -32,15 +32,14 @@ COPY --from=vendor /app/vendor ./vendor
 FROM base AS frontend
 
 RUN apk add --no-cache nodejs npm
-RUN npm ci && npm run build
+RUN npm install && npm run build
 
 
 FROM base AS runtime
 
 COPY --from=frontend /var/www/html/public/build ./public/build
 
-RUN mkdir -p storage/framework/cache storage/framework/sessions storage/framework/views bootstrap/cache \ 
-    app app/public app/public/projects \
+RUN mkdir -p storage/app/public storage/app/public/projects storage/framework/cache storage/framework/sessions storage/framework/views bootstrap/cache \
     && chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R ug+rwx storage bootstrap/cache
 

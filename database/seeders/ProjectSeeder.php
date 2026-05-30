@@ -46,6 +46,22 @@ class ProjectSeeder extends Seeder
                 'meta_description' => 'Renovation d un equipement public et remise aux normes environnementales.',
                 'status' => 'published',
             ],
+            [
+                'title' => 'Hotel de Ville Annexe 2',
+                'slug' => 'hotel-de-ville-annexe-2',
+                'description' => 'Renovation lourde d un batiment public des annees 30 avec accesibilite complete.',
+                'meta_title' => 'Hotel de Ville Annexe',
+                'meta_description' => 'Renovation d un equipement public et remise aux normes environnementales.',
+                'status' => 'published',
+            ],
+            [
+                'title' => 'Hotel de Ville Annexe 3',
+                'slug' => 'hotel-de-ville-annexe-3',
+                'description' => 'Renovation lourde d un batiment public des annees 30 avec accesibilite complete.',
+                'meta_title' => 'Hotel de Ville Annexe',
+                'meta_description' => 'Renovation d un equipement public et remise aux normes environnementales.',
+                'status' => 'published',
+            ],
         ];
 
         foreach ($projects as $project) {

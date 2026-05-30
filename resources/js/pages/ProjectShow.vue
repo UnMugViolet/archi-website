@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Head, Link } from '@inertiajs/vue3';
 import { computed, ref } from 'vue';
+import Header from '@/components/base/Header.vue';
 
 type Category = {
     id: number;
@@ -88,14 +89,11 @@ const showNextImage = (): void => {
     currentImageIndex.value =
         (currentImageIndex.value + 1) % carouselImages.value.length;
 };
-
-const selectImage = (index: number): void => {
-    currentImageIndex.value = index;
-};
 </script>
 
 <template>
     <Head :title="project.meta_title || project.title">
+        <title>{{ project.meta_title || project.title }}</title>
         <meta
             head-key="title"
             name="title"
@@ -107,13 +105,10 @@ const selectImage = (index: number): void => {
             :content="project.meta_description || project.meta_description || 'Archi website nouveau projet en construction'"
         />
     </Head>
+    <Header/>
 
     <div class="min-h-screen bg-white text-stone-900">
         <main class="mx-auto w-full px-50 py-12">
-            <Link href="/" class="mb-8 inline-block text-sm text-stone-600 hover:text-stone-900">
-                Retour aux projets
-            </Link>
-
             <section class="mb-12 grid gap-8  p-6 lg:grid-cols-2 lg:p-8">
                 <div>
                     <h1 class="text-4xl font-semibold tracking-tight">{{ project.title }}</h1>
@@ -149,11 +144,11 @@ const selectImage = (index: number): void => {
                             v-if="activeImage"
                             :src="activeImage.path"
                             :alt="activeImage.alt_text || project.title"
-                            class="h-[28rem] w-full object-cover"
+                            class="h-112 w-full object-cover"
                         />
                         <div
                             v-else
-                            class="flex h-[28rem] items-center justify-center text-sm text-stone-500"
+                            class="flex h-112 items-center justify-center text-sm text-stone-500"
                         >
                             Aucune image
                         </div>
@@ -176,18 +171,6 @@ const selectImage = (index: number): void => {
                         >
                             Precedent
                         </button>
-
-                        <div class="flex items-center gap-2">
-                            <button
-                                v-for="(image, index) in carouselImages"
-                                :key="image.id"
-                                type="button"
-                                class="rounded-full h-2.5 w-2.5"
-                                :class="index === currentImageIndex ? 'bg-stone-900' : 'bg-stone-300'"
-                                :aria-label="`Afficher image ${index + 1}`"
-                                @click="selectImage(index)"
-                            />
-                        </div>
 
                         <button
                             type="button"

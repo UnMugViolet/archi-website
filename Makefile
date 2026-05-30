@@ -27,7 +27,7 @@ install: ## Install all dependencies (need php composer npm installed)
 
 dev: ## Run the development environment
 	@echo "$(CLR_YELLOW) Launching development environment...$(CLR_RESET)"
-	@$(DOCKER_COMPOSE) up -d mariadb
+	@$(DOCKER_COMPOSE) up -d --build mariadb
 	@$(COMPOSER) run dev
 
 clean: ## Clean the cache and compiled files
